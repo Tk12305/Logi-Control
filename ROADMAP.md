@@ -8,7 +8,7 @@ Keep the project a safe Electron interface around **Solaar** and **BlueZ**. Do n
 
 | Dates | Outcome | Work items | Done when |
 | --- | --- | --- | --- |
-| **19–24 July** | GitHub-ready v0.1 | Create repository; add this README, a licence, screenshots, issue templates, and a first release tag. | A new user can understand, install, launch, and report a problem without private guidance. |
+| **19–24 July** | GitHub-ready v0.1.0 | Create repository; add this README, a licence, screenshots, issue templates, and a first release tag. | A new user can understand, install, launch, and report a problem without private guidance. |
 | **25 July–17 August** | Reliable MX Master 3S release | Test Bolt connection, application launcher, DPI, wheel mode, SmartShift, and diagnostics after reboot. Fix only reproducible bugs. | The app works from the desktop launcher on the test laptop. |
 | **18 August-1 September** | Add features | Add keyboard support if codex or i can get it done. |
 
