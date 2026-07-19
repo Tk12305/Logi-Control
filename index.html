@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logi Arch Control</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div><p class="eyebrow">ARCH LINUX · LOGITECH</p><h1>Logi Arch Control</h1><p class="sub">A native Linux control panel powered by Solaar and BlueZ.</p></div>
+      <div class="actions"><button id="refresh">Refresh devices</button><button class="secondary" id="copy-report">Copy report</button><button class="secondary" id="solaar">Open Solaar</button></div>
+    </section>
+
+    <section class="notice"><strong>MX Master 3S:</strong> Options+ itself is Windows/macOS-only. This app provides its Linux equivalent for discovery, receiver pairing, battery and supported settings through Solaar.</section>
+
+    <section class="controls">
+      <div class="control-title"><div><p class="eyebrow">MX MASTER 3S CONTROLS</p><h2>Hardware settings</h2></div><span id="save-status" aria-live="polite"></span></div>
+      <div class="control-grid">
+        <label>DPI <output id="dpi-value">1000</output><input id="dpi" type="range" min="200" max="8000" value="1000" step="50" /></label>
+        <label>Wheel mode <select id="scroll-ratchet"><option>Ratcheted</option><option>Freespinning</option></select></label>
+        <label>SmartShift threshold <output id="smart-shift-value">10</output><input id="smart-shift" type="range" min="0" max="50" value="10" step="1" /></label>
+        <label class="toggle">Invert vertical scroll <input id="hires-smooth-invert" type="checkbox" /><span></span></label>
+        <label class="toggle">High-resolution scrolling <input id="hires-smooth-resolution" type="checkbox" /><span></span></label>
+        <label class="toggle">Invert thumb wheel <input id="thumb-scroll-invert" type="checkbox" /><span></span></label>
+      </div>
+      <p class="fine">Changes are written to the mouse through Solaar and persist across restarts. Scroll/button diversion is intentionally excluded: it is for advanced Solaar Rules and needs additional Wayland permissions.</p>
+    </section>
+
+    <section class="quick">
+      <div class="quick-card"><span>Connection</span><strong id="connection">Checking…</strong><small>Logi Bolt receiver status</small></div>
+      <div class="quick-card"><span>Battery</span><strong id="battery">Checking…</strong><small>Reported by the mouse</small></div>
+      <div class="quick-card"><span>Active DPI</span><strong id="active-dpi">1000</strong><small>Hardware sensitivity</small></div>
+      <div class="quick-card"><span>SmartShift</span><strong id="active-smart-shift">10</strong><small>Wheel speed threshold</small></div>
+    </section>
+
+    <section class="grid">
+      <article><header><h2>Solaar / Logi Bolt</h2><span id="solaar-state">Checking…</span></header><pre id="solaar-output"></pre></article>
+      <article><header><h2>Paired Bluetooth devices</h2><span id="bluetooth-state">Checking…</span></header><pre id="bluetooth-output"></pre></article>
+      <article><header><h2>MX Master 3S settings</h2><span id="settings-state">Checking…</span></header><pre id="settings-output"></pre></article>
+      <article><header><h2>Linux input devices</h2><span id="input-state">Checking…</span></header><pre id="input-output"></pre></article>
+    </section>
+
+    <section class="fix">
+      <h2>If Bluetooth says connected but the mouse does nothing</h2>
+      <ol>
+        <li>Check that the MX Master is on the selected Easy-Switch channel.</li>
+        <li>Hold its underside button for three seconds until the LED flashes rapidly.</li>
+        <li>Remove the old pairing and pair again using the commands below.</li>
+      </ol>
+      <pre>bluetoothctl
+devices
+remove XX:XX:XX:XX:XX:XX
+scan on
+# put the mouse into pairing mode
+pair XX:XX:XX:XX:XX:XX
+trust XX:XX:XX:XX:XX:XX
+connect XX:XX:XX:XX:XX:XX
+info XX:XX:XX:XX:XX:XX</pre>
+      <p>With your Logi Bolt receiver connected, use <strong>Open Solaar</strong> to pair devices and change the settings that Solaar detects. This app keeps the safe system status in one place.</p>
+    </section>
+    <section class="advanced">
+      <h2>Advanced controls</h2>
+      <p>Use Solaar for receiver pairing, supported button actions, gesture rules and per-device settings. In Wayland, button-diversion rules require extra permissions; the app keeps them separate so ordinary scrolling and buttons continue to work.</p>
+      <button class="secondary" id="solaar-bottom">Open Solaar advanced settings</button>
+    </section>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>
