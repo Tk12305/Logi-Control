@@ -1,4 +1,4 @@
-# GitHub listing copy
+# GitHub listing
 
 ## Repository name
 
