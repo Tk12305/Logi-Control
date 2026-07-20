@@ -23,15 +23,8 @@ This is an independent community project. Logitech and Logi Options+ are tradema
 
 ## Install
 
-### Quick install — recommended
-
-1. Download or clone this repository.
-2. Open a terminal in the project directory.
-3. Run:
-
-```bash
-bash install.sh
-```
+### For Arch
+[Arch-Install.md](Arch-Install.md)
 
 The installer installs Electron, Solaar, BlueZ, and BlueZ utilities using `pacman`; enables Bluetooth; copies the app to `~/.local/share/logi-control`; and adds **Logi Control** to your desktop app launcher.
 
