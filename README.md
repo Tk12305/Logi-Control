@@ -33,7 +33,7 @@ This is an independent community project. Logitech and Logi Options+ are tradema
 bash install.sh
 ```
 
-The installer installs Electron, Solaar, BlueZ, and BlueZ utilities using `pacman`; enables Bluetooth; copies the app to `~/.local/share/logi-arch-control`; and adds **Logi Arch Control** to your desktop app launcher.
+The installer installs Electron, Solaar, BlueZ, and BlueZ utilities using `pacman`; enables Bluetooth; copies the app to `~/.local/share/logi-control`; and adds **Logi Control** to your desktop app launcher.
 
 The installer asks for your password only when Arch needs permission to install packages or enable Bluetooth.
 
