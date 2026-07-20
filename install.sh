@@ -20,7 +20,7 @@ tar --exclude='./node_modules' --exclude='./.git' --exclude='./*.zip' -cf - . | 
 cat > "$desktop_dir/$app_name.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Logi Arch Control
+Name=Logi Control
 Comment=Logitech Bolt and MX Master controls for Arch Linux
 Exec=electron $app_dir
 Icon=input-mouse
@@ -29,5 +29,5 @@ Categories=Settings;HardwareSettings;
 EOF
 
 echo
-echo 'Installed Logi Arch Control.'
+echo 'Installed Logi Control.'
 echo 'Find it in your app launcher, or run: electron ~/.local/share/logi-arch-control'
