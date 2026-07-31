@@ -1,6 +1,6 @@
 {
   "name": "logi-arch-control",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "An Electron control panel for Logitech devices on Arch Linux",
   "main": "main.js",

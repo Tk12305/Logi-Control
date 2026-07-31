@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Logi Arch Control</title>
+  <title>Logi Control</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -13,47 +13,70 @@
       <div class="actions"><button id="refresh">Refresh devices</button><button class="secondary" id="copy-report">Copy report</button><button class="secondary" id="solaar">Open Solaar</button></div>
     </section>
 
-    <section class="notice"><strong>Logitech Mouses Supported by Solarr:</strong> Options+ itself is Windows/macOS-only. This app provides its Linux equivalent for discovery, receiver pairing, battery and supported settings through Solaar.</section>
+    <section class="notice"><strong>Supported devices:</strong> Logitech mice and keyboards recognised by Solaar. Options+ is Windows/macOS-only — this app provides its Linux equivalent for discovery, receiver pairing, battery status, and supported hardware settings.</section>
 
-    <section class="controls">
+    <section class="device-bar">
+      <label for="device-select">Active device</label>
+      <select id="device-select"><option value="">Detecting devices…</option></select>
+      <span id="device-kind" class="device-kind">—</span>
+    </section>
+
+    <section class="controls mouse-controls" id="mouse-controls" hidden>
       <div class="control-title"><div><p class="eyebrow">MOUSE CONTROLS</p><h2>Hardware settings</h2></div><span id="save-status" aria-live="polite"></span></div>
       <div class="control-grid">
-        <label>DPI <output id="dpi-value">1000</output><input id="dpi" type="range" min="200" max="8000" value="1000" step="50" /></label>
-        <label>Wheel mode <select id="scroll-ratchet"><option>Ratcheted</option><option>Freespinning</option></select></label>
-        <label>SmartShift threshold <output id="smart-shift-value">10</output><input id="smart-shift" type="range" min="0" max="50" value="10" step="1" /></label>
-        <label class="toggle">Invert vertical scroll <input id="hires-smooth-invert" type="checkbox" /><span></span></label>
-        <label class="toggle">High-resolution scrolling <input id="hires-smooth-resolution" type="checkbox" /><span></span></label>
-        <label class="toggle">Invert thumb wheel <input id="thumb-scroll-invert" type="checkbox" /><span></span></label>
+        <label data-setting="dpi">DPI <output id="dpi-value">1000</output><input id="dpi" type="range" min="200" max="8000" value="1000" step="50" /></label>
+        <label data-setting="scroll-ratchet">Wheel mode <select id="scroll-ratchet"><option>Ratcheted</option><option>Freespinning</option></select></label>
+        <label data-setting="smart-shift">SmartShift threshold <output id="smart-shift-value">10</output><input id="smart-shift" type="range" min="0" max="50" value="10" step="1" /></label>
+        <label class="toggle" data-setting="hires-smooth-invert">Invert vertical scroll <input id="hires-smooth-invert" type="checkbox" /><span></span></label>
+        <label class="toggle" data-setting="hires-smooth-resolution">High-resolution scrolling <input id="hires-smooth-resolution" type="checkbox" /><span></span></label>
+        <label class="toggle" data-setting="thumb-scroll-invert">Invert thumb wheel <input id="thumb-scroll-invert" type="checkbox" /><span></span></label>
       </div>
       <p class="fine">Changes are written to the mouse through Solaar and persist across restarts. Scroll/button diversion is intentionally excluded: it is for advanced Solaar Rules and needs additional Wayland permissions.</p>
     </section>
 
+    <section class="controls keyboard-controls" id="keyboard-controls" hidden>
+      <div class="control-title"><div><p class="eyebrow">KEYBOARD CONTROLS</p><h2>Hardware settings</h2></div><span id="keyboard-save-status" aria-live="polite"></span></div>
+      <div class="control-grid">
+        <label class="toggle" data-setting="backlight">Backlight <input id="backlight" type="checkbox" /><span></span></label>
+        <label class="toggle" data-setting="fn-swap">Swap Fn keys (F1–F12 as primary) <input id="fn-swap" type="checkbox" /><span></span></label>
+        <label data-setting="multiplatform">Operating system layout <select id="multiplatform"><option value="Windows">Windows / Linux</option><option value="MacOS">macOS</option><option value="iOS">iOS / iPadOS</option><option value="Android">Android</option></select></label>
+      </div>
+      <p class="fine">Keyboard settings are applied through Solaar. Key remapping and per-key rules remain in Solaar's Rule Editor. Some keyboards require Fn+Esc to toggle Fn-swap if the software setting has no effect.</p>
+    </section>
+
+    <section class="controls no-controls" id="no-controls" hidden>
+      <div class="control-title"><div><p class="eyebrow">DEVICE CONTROLS</p><h2>No configurable settings</h2></div></div>
+      <p class="fine">The selected device does not expose hardware settings that Logi Control can change safely. Use <strong>Open Solaar</strong> for pairing, key diversion, and advanced configuration.</p>
+    </section>
+
     <section class="quick">
-      <div class="quick-card"><span>Connection</span><strong id="connection">Checking…</strong><small>Logi Bolt receiver status</small></div>
-      <div class="quick-card"><span>Battery</span><strong id="battery">Checking…</strong><small>Reported by the mouse</small></div>
-      <div class="quick-card"><span>Active DPI</span><strong id="active-dpi">1000</strong><small>Hardware sensitivity</small></div>
-      <div class="quick-card"><span>SmartShift</span><strong id="active-smart-shift">10</strong><small>Wheel speed threshold</small></div>
+      <div class="quick-card"><span>Connection</span><strong id="connection">Checking…</strong><small id="connection-detail">Receiver status</small></div>
+      <div class="quick-card"><span>Battery</span><strong id="battery">Checking…</strong><small id="battery-detail">Reported by device</small></div>
+      <div class="quick-card mouse-stat" id="stat-dpi"><span>Active DPI</span><strong id="active-dpi">—</strong><small>Hardware sensitivity</small></div>
+      <div class="quick-card mouse-stat" id="stat-smart-shift"><span>SmartShift</span><strong id="active-smart-shift">—</strong><small>Wheel speed threshold</small></div>
+      <div class="quick-card keyboard-stat" id="stat-backlight" hidden><span>Backlight</span><strong id="active-backlight">—</strong><small>Keyboard illumination</small></div>
+      <div class="quick-card keyboard-stat" id="stat-fn-swap" hidden><span>Fn swap</span><strong id="active-fn-swap">—</strong><small>F-key behaviour</small></div>
     </section>
 
     <section class="grid">
       <article><header><h2>Solaar / Logi Bolt</h2><span id="solaar-state">Checking…</span></header><pre id="solaar-output"></pre></article>
       <article><header><h2>Paired Bluetooth devices</h2><span id="bluetooth-state">Checking…</span></header><pre id="bluetooth-output"></pre></article>
-      <article><header><h2>MX Master 3S settings</h2><span id="settings-state">Checking…</span></header><pre id="settings-output"></pre></article>
+      <article class="wide"><header><h2 id="settings-title">Device settings</h2><span id="settings-state">Checking…</span></header><pre id="settings-output"></pre></article>
       <article><header><h2>Linux input devices</h2><span id="input-state">Checking…</span></header><pre id="input-output"></pre></article>
     </section>
 
     <section class="fix">
-      <h2>If Bluetooth says connected but the mouse does nothing</h2>
+      <h2>If Bluetooth says connected but the device does nothing</h2>
       <ol>
-        <li>Check that the MX Master is on the selected Easy-Switch channel.</li>
-        <li>Hold its underside button for three seconds until the LED flashes rapidly.</li>
+        <li>Check that the device is on the selected Easy-Switch channel.</li>
+        <li>Hold the pairing button for three seconds until the LED flashes rapidly.</li>
         <li>Remove the old pairing and pair again using the commands below.</li>
       </ol>
       <pre>bluetoothctl
 devices
 remove XX:XX:XX:XX:XX:XX
 scan on
-# put the mouse into pairing mode
+# put the device into pairing mode
 pair XX:XX:XX:XX:XX:XX
 trust XX:XX:XX:XX:XX:XX
 connect XX:XX:XX:XX:XX:XX

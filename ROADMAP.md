@@ -10,7 +10,7 @@ Keep the project a safe Electron interface around **Solaar** and **BlueZ**. Do n
 | --- | --- | --- | --- |
 | **19–24 July** | GitHub-ready v0.1.0 | Create repository; add this README, a licence, screenshots, issue templates, and a first release tag. | A new user can understand, install, launch, and report a problem without private guidance. |
 | **25 July–17 August** | Reliable MX Master 3S release | Test Bolt connection, application launcher, DPI, wheel mode, SmartShift, and diagnostics after reboot. Fix only reproducible bugs. | The app works from the desktop launcher on the test laptop. |
-| **18 August-1 September** | Add features | Add keyboard support if codex or i can get it done. |
+| **18 August–1 September** | Keyboard support (v0.3.0) | Generic device discovery; keyboard controls for backlight, Fn-swap, and OS layout; device selector in UI. | Mice and keyboards detected by Solaar can be selected and configured from the app. |
 
 ## Priority order when time is tight
 
@@ -20,25 +20,27 @@ Keep the project a safe Electron interface around **Solaar** and **BlueZ**. Do n
 4. Improve documentation and screenshots.
 5. Only then add a new setting or user-interface feature.
 
-## Explicitly out of scope before 18 August
+## Explicitly out of scope before v0.3.0
 
 - Full Logi Options+ / Logitech Flow parity
 - Universal per-app profiles and macros
 - A custom Bluetooth stack or Linux input driver
 - Replacing Solaar's pairing or advanced-rule engine
 - Claiming compatibility without a tested device or Solaar capability report
+- Per-key remapping or disable-key configuration in Logi Control (use Solaar directly)
 
 ## Suggested GitHub milestones
 
-- `v0.1.0 — MX Master 3S on Arch`
-- `v0.2.0 — Generic device discovery`
-- `v0.3.0 — Keyboard visibility`
+- `v0.1.0 — MX Master 3S on Arch` ✓
+- `v0.2.0 — Generic device discovery` ✓ (merged into v0.3.0)
+- `v0.3.0 — Keyboard visibility` ✓
 
 ## Test checklist for every release
 
 - Launch from a terminal and desktop menu.
-- Detect a Bolt receiver and connected device.
+- Detect a Bolt receiver and connected device(s).
 - Refresh diagnostics without errors.
-- Change one safe setting and confirm it persists after reconnecting the device.
+- Select each detected mouse and keyboard from the device dropdown.
+- Change one safe setting per device type and confirm it persists after reconnecting.
 - Confirm that unsupported settings fail safely.
 - Check the README from a clean machine/user perspective.

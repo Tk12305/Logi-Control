@@ -14,50 +14,108 @@ function run(command, args = []) {
   });
 }
 
+function parseDevices(solaarOutput) {
+  const devices = [];
+  const lines = solaarOutput.split('\n');
+  let current = null;
+
+  for (const line of lines) {
+    const headerMatch = line.match(/^\s+(\d+):\s+(.+)$/);
+    if (headerMatch) {
+      if (current) devices.push(current);
+      current = { number: Number(headerMatch[1]), name: headerMatch[2].trim(), kind: null, battery: null };
+      continue;
+    }
+    if (!current) continue;
+
+    const kindMatch = line.match(/Kind\s*:\s*(\S+)/);
+    if (kindMatch) {
+      const kind = kindMatch[1].toLowerCase();
+      current.kind = kind === '?' ? null : kind;
+    }
+
+    const batteryMatch = line.match(/Battery:\s*(\d+%)/i);
+    if (batteryMatch) current.battery = batteryMatch[1];
+  }
+  if (current) devices.push(current);
+
+  return devices.filter((device) => device.name);
+}
+
+function inferKindFromConfig(configOutput) {
+  if (/^dpi\s*=/m.test(configOutput) || /^smart-shift\s*=/m.test(configOutput)) return 'mouse';
+  if (/^backlight\s*=/m.test(configOutput) || /^fn-swap\s*=/m.test(configOutput)) return 'keyboard';
+  return 'unknown';
+}
+
 async function diagnostics() {
-  const [solaar, bluetooth, input, settings] = await Promise.all([
+  const [solaar, bluetooth, input] = await Promise.all([
     run('solaar', ['show']),
     run('bluetoothctl', ['devices']),
-    run('cat', ['/proc/bus/input/devices']),
-    run('solaar', ['config', 'MX Master 3S'])
+    run('cat', ['/proc/bus/input/devices'])
   ]);
-  return { solaar, bluetooth, input, settings };
+
+  const parsed = parseDevices(solaar.output);
+  const configResults = await Promise.all(parsed.map((device) => run('solaar', ['config', device.name])));
+
+  const devices = parsed.map((device, index) => {
+    const config = configResults[index];
+    const kind = device.kind || inferKindFromConfig(config.output);
+    return { ...device, kind, config };
+  });
+
+  return { solaar, bluetooth, input, devices };
 }
 
 function diagnosticText(_event, data) {
+  const deviceSections = (data.devices || []).flatMap((device) => [
+    '',
+    `[${device.name} settings]`,
+    device.config?.output || 'No settings available.'
+  ]);
+
   return [
-    'Logi Arch Control diagnostic report',
+    'Logi Control diagnostic report',
     `Generated: ${new Date().toISOString()}`,
     '',
-    '[Solaar]', data.solaar.output,
+    '[Solaar]',
+    data.solaar.output,
+    ...deviceSections,
     '',
-    '[MX Master 3S settings]', data.settings.output,
+    '[Bluetooth devices]',
+    data.bluetooth.output,
     '',
-    '[Bluetooth devices]', data.bluetooth.output,
-    '',
-    '[Linux input devices]', data.input.output
+    '[Linux input devices]',
+    data.input.output
   ].join('\n');
 }
 
 const allowedSettings = {
-  'hires-smooth-invert': (value) => ['true', 'false'].includes(value),
-  'hires-smooth-resolution': (value) => ['true', 'false'].includes(value),
+  'hires-smooth-invert': (value) => ['true', 'false'].includes(String(value).toLowerCase()),
+  'hires-smooth-resolution': (value) => ['true', 'false'].includes(String(value).toLowerCase()),
   'scroll-ratchet': (value) => ['Ratcheted', 'Freespinning'].includes(value),
   'smart-shift': (value) => Number.isInteger(Number(value)) && Number(value) >= 0 && Number(value) <= 50,
-  'thumb-scroll-invert': (value) => ['true', 'false'].includes(value),
-  dpi: (value) => Number.isInteger(Number(value)) && Number(value) >= 200 && Number(value) <= 8000 && Number(value) % 50 === 0
+  'thumb-scroll-invert': (value) => ['true', 'false'].includes(String(value).toLowerCase()),
+  dpi: (value) => Number.isInteger(Number(value)) && Number(value) >= 200 && Number(value) <= 8000 && Number(value) % 50 === 0,
+  backlight: (value) => ['true', 'false'].includes(String(value).toLowerCase()),
+  'fn-swap': (value) => ['true', 'false'].includes(String(value).toLowerCase()),
+  multiplatform: (value) => ['Windows', 'MacOS', 'iOS', 'Android', '0', '1', '2', '3'].includes(String(value))
 };
 
-function setSetting(_event, setting, value) {
+function setSetting(_event, device, setting, value) {
+  if (!device || typeof device !== 'string' || device.trim().length < 3) {
+    return { ok: false, output: 'A valid device name is required.' };
+  }
+
   const valid = allowedSettings[setting];
   if (!valid || !valid(String(value))) return { ok: false, output: 'That setting or value is not allowed.' };
-  return run('solaar', ['config', 'MX Master 3S', setting, String(value)]);
+  return run('solaar', ['config', device.trim(), setting, String(value)]);
 }
 
 function createWindow() {
   const window = new BrowserWindow({
     width: 980,
-    height: 760,
+    height: 860,
     minWidth: 760,
     minHeight: 560,
     backgroundColor: '#10161f',
