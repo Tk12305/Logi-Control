@@ -32,8 +32,8 @@ Keep the project a safe Electron interface around **Solaar** and **BlueZ**. Do n
 ## Suggested GitHub milestones
 
 - `v0.1.0 — MX Master 3S on Arch` ✓
-- `v0.2.0 — Generic device discovery` ✓ (merged into v0.3.0)
-- `v0.3.0 — Keyboard visibility` ✓
+- `v0.1.2 — Generic device discovery` ✓ (merged into v0.1.3)
+- `v0.1.3 — Keyboard visibility` ✓
 
 ## Test checklist for every release
 
