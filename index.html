@@ -1,94 +1,15 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Logi Control</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main>
-    <section class="hero">
-      <div><p class="eyebrow">ARCH LINUX · LOGITECH</p><h1>Logi Control</h1><p class="sub">A native Linux control panel powered by Solaar and BlueZ.</p></div>
-      <div class="actions"><button id="refresh">Refresh devices</button><button class="secondary" id="copy-report">Copy report</button><button class="secondary" id="solaar">Open Solaar</button></div>
-    </section>
-
-    <section class="notice"><strong>Supported devices:</strong> Logitech mice and keyboards recognised by Solaar. Options+ is Windows/macOS-only — this app provides its Linux equivalent for discovery, receiver pairing, battery status, and supported hardware settings.</section>
-
-    <section class="device-bar">
-      <label for="device-select">Active device</label>
-      <select id="device-select"><option value="">Detecting devices…</option></select>
-      <span id="device-kind" class="device-kind">—</span>
-    </section>
-
-    <section class="controls mouse-controls" id="mouse-controls" hidden>
-      <div class="control-title"><div><p class="eyebrow">MOUSE CONTROLS</p><h2>Hardware settings</h2></div><span id="save-status" aria-live="polite"></span></div>
-      <div class="control-grid">
-        <label data-setting="dpi">DPI <output id="dpi-value">1000</output><input id="dpi" type="range" min="200" max="8000" value="1000" step="50" /></label>
-        <label data-setting="scroll-ratchet">Wheel mode <select id="scroll-ratchet"><option>Ratcheted</option><option>Freespinning</option></select></label>
-        <label data-setting="smart-shift">SmartShift threshold <output id="smart-shift-value">10</output><input id="smart-shift" type="range" min="0" max="50" value="10" step="1" /></label>
-        <label class="toggle" data-setting="hires-smooth-invert">Invert vertical scroll <input id="hires-smooth-invert" type="checkbox" /><span></span></label>
-        <label class="toggle" data-setting="hires-smooth-resolution">High-resolution scrolling <input id="hires-smooth-resolution" type="checkbox" /><span></span></label>
-        <label class="toggle" data-setting="thumb-scroll-invert">Invert thumb wheel <input id="thumb-scroll-invert" type="checkbox" /><span></span></label>
-      </div>
-      <p class="fine">Changes are written to the mouse through Solaar and persist across restarts. Scroll/button diversion is intentionally excluded: it is for advanced Solaar Rules and needs additional Wayland permissions.</p>
-    </section>
-
-    <section class="controls keyboard-controls" id="keyboard-controls" hidden>
-      <div class="control-title"><div><p class="eyebrow">KEYBOARD CONTROLS</p><h2>Hardware settings</h2></div><span id="keyboard-save-status" aria-live="polite"></span></div>
-      <div class="control-grid">
-        <label class="toggle" data-setting="backlight">Backlight <input id="backlight" type="checkbox" /><span></span></label>
-        <label class="toggle" data-setting="fn-swap">Swap Fn keys (F1–F12 as primary) <input id="fn-swap" type="checkbox" /><span></span></label>
-        <label data-setting="multiplatform">Operating system layout <select id="multiplatform"><option value="Windows">Windows / Linux</option><option value="MacOS">macOS</option><option value="iOS">iOS / iPadOS</option><option value="Android">Android</option></select></label>
-      </div>
-      <p class="fine">Keyboard settings are applied through Solaar. Key remapping and per-key rules remain in Solaar's Rule Editor. Some keyboards require Fn+Esc to toggle Fn-swap if the software setting has no effect.</p>
-    </section>
-
-    <section class="controls no-controls" id="no-controls" hidden>
-      <div class="control-title"><div><p class="eyebrow">DEVICE CONTROLS</p><h2>No configurable settings</h2></div></div>
-      <p class="fine">The selected device does not expose hardware settings that Logi Control can change safely. Use <strong>Open Solaar</strong> for pairing, key diversion, and advanced configuration.</p>
-    </section>
-
-    <section class="quick">
-      <div class="quick-card"><span>Connection</span><strong id="connection">Checking…</strong><small id="connection-detail">Receiver status</small></div>
-      <div class="quick-card"><span>Battery</span><strong id="battery">Checking…</strong><small id="battery-detail">Reported by device</small></div>
-      <div class="quick-card mouse-stat" id="stat-dpi"><span>Active DPI</span><strong id="active-dpi">—</strong><small>Hardware sensitivity</small></div>
-      <div class="quick-card mouse-stat" id="stat-smart-shift"><span>SmartShift</span><strong id="active-smart-shift">—</strong><small>Wheel speed threshold</small></div>
-      <div class="quick-card keyboard-stat" id="stat-backlight" hidden><span>Backlight</span><strong id="active-backlight">—</strong><small>Keyboard illumination</small></div>
-      <div class="quick-card keyboard-stat" id="stat-fn-swap" hidden><span>Fn swap</span><strong id="active-fn-swap">—</strong><small>F-key behaviour</small></div>
-    </section>
-
-    <section class="grid">
-      <article><header><h2>Solaar / Logi Bolt</h2><span id="solaar-state">Checking…</span></header><pre id="solaar-output"></pre></article>
-      <article><header><h2>Paired Bluetooth devices</h2><span id="bluetooth-state">Checking…</span></header><pre id="bluetooth-output"></pre></article>
-      <article class="wide"><header><h2 id="settings-title">Device settings</h2><span id="settings-state">Checking…</span></header><pre id="settings-output"></pre></article>
-      <article><header><h2>Linux input devices</h2><span id="input-state">Checking…</span></header><pre id="input-output"></pre></article>
-    </section>
-
-    <section class="fix">
-      <h2>If Bluetooth says connected but the device does nothing</h2>
-      <ol>
-        <li>Check that the device is on the selected Easy-Switch channel.</li>
-        <li>Hold the pairing button for three seconds until the LED flashes rapidly.</li>
-        <li>Remove the old pairing and pair again using the commands below.</li>
-      </ol>
-      <pre>bluetoothctl
-devices
-remove XX:XX:XX:XX:XX:XX
-scan on
-# put the device into pairing mode
-pair XX:XX:XX:XX:XX:XX
-trust XX:XX:XX:XX:XX:XX
-connect XX:XX:XX:XX:XX:XX
-info XX:XX:XX:XX:XX:XX</pre>
-      <p>With your Logi Bolt receiver connected, use <strong>Open Solaar</strong> to pair devices and change the settings that Solaar detects. This app keeps the safe system status in one place.</p>
-    </section>
-    <section class="advanced">
-      <h2>Advanced controls</h2>
-      <p>Use Solaar for receiver pairing, supported button actions, gesture rules and per-device settings. In Wayland, button-diversion rules require extra permissions; the app keeps them separate so ordinary scrolling and buttons continue to work.</p>
-      <button class="secondary" id="solaar-bottom">Open Solaar advanced settings</button>
-    </section>
-  </main>
-  <script src="renderer.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Logi Control</title><link rel="stylesheet" href="styles.css" /></head>
+<body><main class="app-shell"><aside class="sidebar"><div class="brand"><span class="brand-mark">+</span> Logi Control</div><p class="nav-label">WORKSPACE</p><nav class="side-nav" aria-label="Primary navigation"><button class="nav-item active" type="button"><span class="nav-icon">⌁</span>Devices</button><button class="nav-item" type="button" id="solaar"><span class="nav-icon">◇</span>Logi Bolt receiver</button><button class="nav-item" type="button" id="copy-report"><span class="nav-icon">▣</span>Diagnostics</button></nav><div class="sidebar-footer"><strong>Linux companion</strong>Powered by Solaar &amp; BlueZ</div></aside>
+<div class="workspace"><header class="topbar"><div><h1>Your devices</h1><p>Personalise your Logitech setup.</p></div><div class="actions"><button class="secondary" id="copy-report-top" type="button">Copy report</button><button id="refresh" type="button">Refresh</button></div></header>
+<section class="device-hero" aria-labelledby="selected-device-heading"><div><p class="eyebrow">CONNECTED DEVICE</p><h2 id="selected-device-heading">Ready to customise</h2><p class="sub">Select a detected device to see the settings it supports. Changes are saved directly to your hardware.</p><div class="device-bar"><label for="device-select">Device</label><select id="device-select"><option value="">Detecting devices…</option></select><span id="device-kind" class="device-kind">—</span></div></div><div class="device-art" aria-hidden="true"></div></section>
+<section class="quick" aria-label="Device overview"><div class="quick-card"><span>Connection</span><strong id="connection">Checking…</strong><small id="connection-detail">Receiver status</small></div><div class="quick-card"><span>Battery</span><strong id="battery">Checking…</strong><small id="battery-detail">Reported by device</small></div><div class="quick-card mouse-stat" id="stat-dpi"><span>Pointer speed</span><strong id="active-dpi">—</strong><small>Active DPI</small></div><div class="quick-card mouse-stat" id="stat-smart-shift"><span>SmartShift</span><strong id="active-smart-shift">—</strong><small>Wheel threshold</small></div><div class="quick-card keyboard-stat" id="stat-backlight" hidden><span>Backlight</span><strong id="active-backlight">—</strong><small>Keyboard illumination</small></div><div class="quick-card keyboard-stat" id="stat-fn-swap" hidden><span>Fn swap</span><strong id="active-fn-swap">—</strong><small>F-key behaviour</small></div></section>
+<section class="health-card" id="health-card" aria-live="polite"><span class="health-dot" id="health-dot"></span><div><strong id="health-title">Checking your setup…</strong><p id="health-detail">Looking for Logitech devices and receiver services.</p></div></section>
+<section class="bluetooth-manager" aria-labelledby="bluetooth-manager-title"><div class="bluetooth-manager-heading"><div><p class="eyebrow">BLUETOOTH</p><h2 id="bluetooth-manager-title">Manage Bluetooth devices</h2><p>Scan for devices, then enter the device address to pair or manage its connection.</p></div><span id="bluetooth-action-status" aria-live="polite"></span></div><div class="bluetooth-actions"><input id="bluetooth-address" inputmode="text" autocomplete="off" spellcheck="false" maxlength="17" placeholder="AA:BB:CC:DD:EE:FF" aria-label="Bluetooth device address" /><button class="secondary" id="bluetooth-scan" type="button">Scan nearby</button><button id="bluetooth-pair" type="button">Pair &amp; trust</button><button class="secondary" id="bluetooth-connect" type="button">Connect</button><button class="secondary" id="bluetooth-disconnect" type="button">Disconnect</button><button class="danger-button" id="bluetooth-remove" type="button">Forget</button></div><p class="fine">Put the device into pairing mode before scanning. Pairing and scanning can take up to 8 seconds.</p><pre class="bluetooth-manager-output" id="bluetooth-manager-output">Paired Bluetooth devices will appear here after a refresh.</pre></section>
+<div class="section-heading"><div><h2>Device settings</h2><p>Only controls supported by your selected device are shown.</p></div></div>
+<section class="controls mouse-controls" id="mouse-controls" hidden><div class="control-title"><div><p class="eyebrow">POINTER &amp; SCROLLING</p><h2>Mouse settings</h2></div><span id="save-status" aria-live="polite"></span></div><div class="control-grid"><label data-setting="dpi">DPI <output id="dpi-value">1000</output><input id="dpi" type="range" min="200" max="8000" value="1000" step="50" /></label><label data-setting="scroll-ratchet">Wheel mode <select id="scroll-ratchet"><option>Ratcheted</option><option>Freespinning</option></select></label><label data-setting="smart-shift">SmartShift threshold <output id="smart-shift-value">10</output><input id="smart-shift" type="range" min="0" max="50" value="10" step="1" /></label><label class="toggle" data-setting="hires-smooth-invert">Invert vertical scroll <input id="hires-smooth-invert" type="checkbox" /></label><label class="toggle" data-setting="hires-smooth-resolution">High-resolution scrolling <input id="hires-smooth-resolution" type="checkbox" /></label><label class="toggle" data-setting="thumb-scroll-invert">Invert thumb wheel <input id="thumb-scroll-invert" type="checkbox" /></label></div><p class="fine">Changes persist across restarts. Scroll and button diversion remain in Solaar Rules because Wayland may need extra permissions.</p></section>
+<section class="controls keyboard-controls" id="keyboard-controls" hidden><div class="control-title"><div><p class="eyebrow">KEYBOARD</p><h2>Keyboard settings</h2></div><span id="keyboard-save-status" aria-live="polite"></span></div><div class="control-grid"><label class="toggle" data-setting="backlight">Backlight <input id="backlight" type="checkbox" /></label><label class="toggle" data-setting="fn-swap">Swap Fn keys (F1–F12 as primary) <input id="fn-swap" type="checkbox" /></label><label data-setting="multiplatform">Operating system layout <select id="multiplatform"><option value="Windows">Windows / Linux</option><option value="MacOS">macOS</option><option value="iOS">iOS / iPadOS</option><option value="Android">Android</option></select></label></div><p class="fine">Keyboard settings are applied through Solaar. Some keyboards require Fn+Esc to toggle Fn-swap.</p></section>
+<section class="controls no-controls" id="no-controls" hidden><div class="control-title"><div><p class="eyebrow">DEVICE CONTROLS</p><h2>No configurable settings</h2></div></div><p class="fine">This device does not expose safe hardware settings. Open Solaar for pairing, key diversion and advanced configuration.</p></section>
+<section class="grid" aria-label="Connection diagnostics"><article><header><h2>Solaar / Logi Bolt</h2><span id="solaar-state">Checking…</span></header><pre id="solaar-output"></pre></article><article><header><h2>Paired Bluetooth devices</h2><span id="bluetooth-state">Checking…</span></header><pre id="bluetooth-output"></pre></article><article class="wide"><header><h2 id="settings-title">Device settings</h2><span id="settings-state">Checking…</span></header><pre id="settings-output"></pre></article><article><header><h2>Linux input devices</h2><span id="input-state">Checking…</span></header><pre id="input-output"></pre></article></section>
+<section class="advanced"><div><h2>Advanced controls</h2><p>Use Solaar for receiver pairing, button actions, gesture rules and per-device settings.</p></div><button class="secondary" id="solaar-bottom" type="button">Open Solaar</button></section><section class="fix"><h2>Bluetooth troubleshooting</h2><ol><li>Check the selected Easy-Switch channel on your device.</li><li>Hold the pairing button for three seconds until its LED flashes rapidly.</li><li>Remove the old pairing and pair again using your Bluetooth settings.</li></ol><p>With a Logi Bolt receiver connected, use <strong>Open Solaar</strong> for pairing and the settings Solaar detects.</p></section></div></main>
+<section class="onboarding" id="onboarding" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" hidden><div class="onboarding-panel"><span class="onboarding-mark">+</span><p class="eyebrow">WELCOME TO LOGI CONTROL</p><h2 id="onboarding-title">Let’s get your setup ready</h2><p id="onboarding-detail">We’ll check for the services and receiver needed to configure your Logitech devices.</p><ol id="onboarding-steps"><li>Connect your Logi Bolt or Unifying receiver.</li><li>Wake your mouse or keyboard.</li><li>Select Refresh to look for devices.</li></ol><code id="onboarding-command" hidden>sudo pacman -S --needed solaar bluez bluez-utils</code><div class="onboarding-actions"><button class="secondary" id="onboarding-copy-command" type="button" hidden>Copy install command</button><button class="secondary" id="onboarding-dismiss" type="button">Not now</button><button id="onboarding-refresh" type="button">Refresh devices</button></div></div></section><script src="renderer.js"></script></body></html>

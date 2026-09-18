@@ -6,7 +6,7 @@
 
 ## Short description
 
-An unofficial Electron control panel for Logitech mice and keyboards on Arch Linux, powered by Solaar and BlueZ.
+An unofficial Electron control panel for Logitech mice and keyboards on Arch Linux, powered by Solaar and BlueZ, with device settings and Bluetooth management.
 
 ## Suggested topics
 
@@ -14,7 +14,7 @@ An unofficial Electron control panel for Logitech mice and keyboards on Arch Lin
 
 ## About text for the first release
 
-Logi Control is an independent Linux control panel for supported Logitech devices. It wraps the proven device-management capabilities of Solaar with a simple Electron interface for device status, diagnostics, and safe hardware settings. Supports mice (DPI, SmartShift, scroll) and keyboards (backlight, Fn-swap, OS layout) detected by Solaar.
+Logi Control is an independent Linux control panel for supported Logitech devices. It wraps Solaar with a device-first Electron interface for connection health, diagnostics, and safe hardware settings. Supports mice (DPI, SmartShift, scroll), keyboards (backlight, Fn-swap, OS layout), and BlueZ Bluetooth actions including scan, pair/trust, connect, disconnect, and forget.
 
 ## Suggested release title
 
@@ -26,5 +26,7 @@ Logi Control is an independent Linux control panel for supported Logitech device
 - Device selector to switch between connected devices.
 - Mouse controls: DPI, SmartShift, scroll-wheel mode, and scroll direction.
 - Keyboard controls: backlight, Fn-swap, and OS layout (multiplatform).
+- First-run setup guidance, remembered device selection, and safe automatic status refreshes.
+- Bluetooth manager: scan, pair/trust, connect, disconnect, and forget with address validation and removal confirmation.
 - Desktop launcher installer; no npm dependency required at runtime.
 - Known limitation: advanced rule-based remapping has extra Wayland permission requirements and is not part of the default interface.

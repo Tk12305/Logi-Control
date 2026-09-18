@@ -112,13 +112,37 @@ function setSetting(_event, device, setting, value) {
   return run('solaar', ['config', device.trim(), setting, String(value)]);
 }
 
+function validBluetoothAddress(address) {
+  return /^([0-9A-F]{2}:){5}[0-9A-F]{2}$/i.test(String(address || '').trim());
+}
+
+async function bluetoothAction(_event, action, address = '') {
+  const safeAction = String(action || '');
+  const safeAddress = String(address || '').trim().toUpperCase();
+
+  if (safeAction === 'scan') return run('bluetoothctl', ['--timeout', '8', 'scan', 'on']);
+  if (!['pair', 'connect', 'disconnect', 'remove'].includes(safeAction) || !validBluetoothAddress(safeAddress)) {
+    return { ok: false, output: 'Enter a valid Bluetooth address, for example AA:BB:CC:DD:EE:FF.' };
+  }
+
+  const result = await run('bluetoothctl', [safeAction, safeAddress]);
+  if (safeAction !== 'pair' || !result.ok) return result;
+
+  const trustResult = await run('bluetoothctl', ['trust', safeAddress]);
+  return {
+    ok: trustResult.ok,
+    command: `${result.command}; ${trustResult.command}`,
+    output: `${result.output}\n\n${trustResult.output}`
+  };
+}
+
 function createWindow() {
   const window = new BrowserWindow({
     width: 980,
     height: 860,
     minWidth: 760,
     minHeight: 560,
-    backgroundColor: '#10161f',
+    backgroundColor: '#121212',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -132,6 +156,7 @@ app.whenReady().then(() => {
   ipcMain.handle('diagnostics', diagnostics);
   ipcMain.handle('diagnostic-text', diagnosticText);
   ipcMain.handle('set-setting', setSetting);
+  ipcMain.handle('bluetooth-action', bluetoothAction);
   ipcMain.handle('open-solaar', () => new Promise((resolve) => {
     const child = spawn('solaar', [], { detached: true, stdio: 'ignore' });
     child.once('error', (error) => resolve({ ok: false, message: error.message }));
